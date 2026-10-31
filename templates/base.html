@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Multimodal Attendance & Engagement Agent{% endblock %}</title>
+  <meta name="description" content="AI-Powered Classroom Intelligence System combining Computer Vision, Audio Signal Processing, and Gemini 2.0 Flash for automated attendance and real-time engagement analytics.">
+  
+  <!-- Modern Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- Application Stylesheet -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block head_extra %}{% endblock %}
+</head>
+<body>
+
+  <!-- Top Header Navigation -->
+  <header class="app-header">
+    <a href="/" class="brand-container">
+      <div class="brand-logo-icon">
+        <i data-lucide="brain-circuit"></i>
+      </div>
+      <div class="brand-titles">
+        <h1>Multimodal Attendance & Engagement Agent</h1>
+        <p>AI-Powered Privacy-Preserving Classroom Intelligence</p>
+      </div>
+    </a>
+
+    <nav class="main-nav">
+      <a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}">
+        <i data-lucide="video" style="width: 16px; height: 16px;"></i> Live Monitor
+      </a>
+      <a href="/attendance" class="nav-link {% if request.path == '/attendance' %}active{% endif %}">
+        <i data-lucide="clipboard-check" style="width: 16px; height: 16px;"></i> Attendance
+      </a>
+      <a href="/analytics" class="nav-link {% if request.path == '/analytics' %}active{% endif %}">
+        <i data-lucide="bar-chart-3" style="width: 16px; height: 16px;"></i> Analytics
+      </a>
+      <a href="/suggestions" class="nav-link {% if request.path == '/suggestions' %}active{% endif %}">
+        <i data-lucide="sparkles" style="width: 16px; height: 16px;"></i> AI Insights
+      </a>
+      <a href="/settings" class="nav-link {% if request.path == '/settings' %}active{% endif %}">
+        <i data-lucide="settings" style="width: 16px; height: 16px;"></i> Settings
+      </a>
+    </nav>
+
+    <div class="header-actions">
+      <div class="status-badge-live">
+        <span class="pulse-dot"></span>
+        <span id="system-status-indicator">SYSTEM ONLINE</span>
+      </div>
+      <a href="https://github.com/manishkr8028-wq/multimodal-attendance-engagement-agent" target="_blank" class="btn btn-outline" style="padding: 0.45rem 0.85rem; font-size: 0.78rem;">
+        <i data-lucide="github" style="width: 14px; height: 14px;"></i> GitHub
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="app-content">
+    <!-- Blue Banner from the Portal Specification -->
+    <div class="project-banner">
+      <div class="banner-text">
+        <h3>Add Demo and GitHub links!</h3>
+        <p>Please update the demo and GitHub links so that your mentor can review and evaluate your project.</p>
+      </div>
+      <div class="banner-buttons">
+        <a href="#quick-demo" class="btn btn-outline" onclick="triggerDemoRun()">
+          <i data-lucide="play-circle" style="width: 16px; height: 16px;"></i> Run Live Demo
+        </a>
+        <a href="https://github.com/manishkr8028-wq/multimodal-attendance-engagement-agent" target="_blank" class="btn btn-secondary">
+          <i data-lucide="git-branch" style="width: 16px; height: 16px;"></i> View Repository
+        </a>
+      </div>
+    </div>
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Global Footer -->
+  <footer class="app-footer">
+    <p>Multimodal Attendance & Engagement Agent &bull; Generative AI with Google Cloud &bull; Developed by Manish Kumar</p>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+    function triggerDemoRun() {
+      if (window.location.pathname !== '/') {
+        window.location.href = '/?autostart=true';
+      } else {
+        const startBtn = document.getElementById('start-session-btn');
+        if (startBtn) startBtn.click();
+      }
+    }
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

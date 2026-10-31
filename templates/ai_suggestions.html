@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}AI-Driven Teaching Suggestions - Gemini 2.0 Flash Decision Support{% endblock %}
+
+{% block content %}
+<div style="display: flex; flex-direction: column; gap: 1.5rem;">
+  <!-- Header Card -->
+  <div class="glass-card" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <div style="display: flex; align-items: center; gap: 0.65rem;">
+        <span class="badge badge-info" style="font-size: 0.78rem;">Powered by Google Gemini 2.0 Flash</span>
+      </div>
+      <h2 style="font-size: 1.25rem; font-weight: 700; margin-top: 0.35rem;">AI-Driven Context-Aware Teaching Decision Support</h2>
+      <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.25rem;">
+        Assistive decision-support agent offering real-time pedagogical nudges, pacing calibration, and interactive classroom intelligence.
+      </p>
+    </div>
+
+    <div style="display: flex; gap: 0.75rem; align-items: center;">
+      <form method="GET" action="/suggestions" style="display: flex; align-items: center; gap: 0.5rem;">
+        <label for="session_id" style="font-size: 0.82rem; color: var(--text-muted);">Session:</label>
+        <select name="session_id" id="session_id" onchange="this.form.submit()" style="background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.5rem 0.85rem; font-family: inherit; font-size: 0.85rem; outline: none;">
+          {% for s in sessions %}
+          <option value="{{ s.id }}" {% if s.id == current_sess_id %}selected{% endif %}>
+            {{ s.title }} ({{ s.id }})
+          </option>
+          {% endfor %}
+        </select>
+      </form>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1.4fr 1.6fr; gap: 1.5rem;">
+    <!-- Left Column: Interactive Teacher Assistant Chat ("Ask the Agent") -->
+    <div class="glass-card" style="display: flex; flex-direction: column;">
+      <div class="card-header-row">
+        <div class="card-title-group">
+          <div class="card-icon" style="background: rgba(99, 102, 241, 0.2); color: #818cf8;"><i data-lucide="bot"></i></div>
+          <div>
+            <h2>Ask the Pedagogical Agent</h2>
+            <p style="font-size: 0.74rem; color: var(--text-muted);">Conversational Classroom Intelligence</p>
+          </div>
+        </div>
+        <span class="badge badge-success"><i data-lucide="sparkles" style="width: 12px; height: 12px;"></i> Gemini Active</span>
+      </div>
+
+      <!-- Quick Prompt Pills -->
+      <div style="display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.85rem;">
+        <button class="btn btn-secondary" style="font-size: 0.74rem; padding: 0.35rem 0.65rem;" onclick="setQuery('Why did engagement dip at minute 16?')">
+          &ldquo;Why did engagement dip at minute 16?&rdquo;
+        </button>
+        <button class="btn btn-secondary" style="font-size: 0.74rem; padding: 0.35rem 0.65rem;" onclick="setQuery('Suggest a 60-second active learning activity')">
+          &ldquo;Suggest a 60-second active learning activity&rdquo;
+        </button>
+        <button class="btn btn-secondary" style="font-size: 0.74rem; padding: 0.35rem 0.65rem;" onclick="setQuery('Give me an overview of student engagement today')">
+          &ldquo;Summarize cohort engagement&rdquo;
+        </button>
+      </div>
+
+      <!-- Chat Window -->
+      <div class="chat-window">
+        <div class="chat-messages" id="chat-messages-container">
+          <div class="chat-bubble assistant">
+            Hello! I am your <strong>Multimodal Classroom Intelligence Agent</strong>. I continuously track student gaze stability, sustained presence, and discussion energy. How can I assist your teaching strategy for this session?
+          </div>
+        </div>
+
+        <div class="chat-input-bar">
+          <input type="text" id="chat-user-input" placeholder="Ask about attention drops, pacing, or teaching strategies..." onkeydown="if(event.key === 'Enter') sendUserQuery()">
+          <button id="send-chat-btn" class="btn btn-primary" onclick="sendUserQuery()">
+            <i data-lucide="send" style="width: 15px; height: 15px;"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Proactive Interventions Chronology -->
+    <div class="glass-card">
+      <div class="card-header-row">
+        <div class="card-title-group">
+          <div class="card-icon" style="background: rgba(236, 72, 153, 0.2); color: #f472b6;"><i data-lucide="zap"></i></div>
+          <div>
+            <h2>Session Pedagogical Interventions Log</h2>
+            <p style="font-size: 0.74rem; color: var(--text-muted);">Triggered by Multimodal Dynamics Anomalies</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="suggestions-feed" style="max-height: 520px;">
+        {% for sug in suggestions %}
+        <div class="suggestion-card" style="margin-bottom: 0.85rem;">
+          <div class="suggestion-header">
+            <span class="category-tag">{{ sug.category }}</span>
+            <span class="time-tag">Minute {{ (sug.elapsed_seconds / 60) | round(1) }}m</span>
+          </div>
+          <div style="font-size: 0.78rem; color: #fbbf24; margin-top: 0.2rem;">
+            <i data-lucide="alert-circle" style="width: 13px; height: 13px; vertical-align: middle;"></i>
+            <strong>Trigger:</strong> {{ sug.trigger_reason }}
+          </div>
+          <p class="suggestion-text" style="margin-top: 0.35rem;">
+            {{ sug.suggestion_text }}
+          </p>
+          <div class="action-item-pill" style="margin-top: 0.4rem;">
+            <i data-lucide="check-circle" style="width: 14px; height: 14px; color: #34d399;"></i>
+            <span><strong>Micro-Action:</strong> {{ sug.action_item }}</span>
+          </div>
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+          <i data-lucide="smile" style="width: 36px; height: 36px; margin-bottom: 0.75rem; color: #818cf8;"></i>
+          <p>No interventions triggered yet. Engagement has remained steady in the target zone!</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function setQuery(text) {
+    const input = document.getElementById('chat-user-input');
+    input.value = text;
+    input.focus();
+  }
+
+  async function sendUserQuery() {
+    const input = document.getElementById('chat-user-input');
+    const query = input.value.trim();
+    if (!query) return;
+
+    const container = document.getElementById('chat-messages-container');
+
+    // Append user bubble
+    const userBubble = document.createElement('div');
+    userBubble.className = 'chat-bubble user';
+    userBubble.textContent = query;
+    container.appendChild(userBubble);
+    input.value = '';
+    container.scrollTop = container.scrollHeight;
+
+    // Loading indicator
+    const loadingBubble = document.createElement('div');
+    loadingBubble.className = 'chat-bubble assistant';
+    loadingBubble.id = 'temp-loading-bubble';
+    loadingBubble.innerHTML = '<span class="pulse-dot" style="display:inline-block; margin-right: 6px;"></span> Consulting Gemini 2.0 Flash...';
+    container.appendChild(loadingBubble);
+    container.scrollTop = container.scrollHeight;
+
+    try {
+      const response = await fetch('/api/ai/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: query,
+          session_id: '{{ current_sess_id }}'
+        })
+      });
+      const data = await response.json();
+      loadingBubble.remove();
+
+      const assistantBubble = document.createElement('div');
+      assistantBubble.className = 'chat-bubble assistant';
+      assistantBubble.innerHTML = data.answer.replace(/\n/g, '<br>');
+      container.appendChild(assistantBubble);
+      container.scrollTop = container.scrollHeight;
+    } catch (e) {
+      loadingBubble.remove();
+      const errBubble = document.createElement('div');
+      errBubble.className = 'chat-bubble assistant';
+      errBubble.textContent = "Error communicating with AI Assistant. Falling back to offline telemetry cache.";
+      container.appendChild(errBubble);
+    }
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}Automated Attendance Register - Multimodal Classroom Intelligence{% endblock %}
+
+{% block content %}
+<div style="display: flex; flex-direction: column; gap: 1.5rem;">
+  <!-- Header with Session Selector & Export Actions -->
+  <div class="glass-card" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h2 style="font-size: 1.25rem; font-weight: 700;">Automated Sustained-Presence Attendance Register</h2>
+      <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.25rem;">
+        Eliminating single-frame false positives via continuous temporal presence verification (&gt; 10s threshold).
+      </p>
+    </div>
+
+    <div style="display: flex; gap: 0.75rem; align-items: center;">
+      <!-- Session selector dropdown -->
+      <form method="GET" action="/attendance" style="display: flex; align-items: center; gap: 0.5rem;">
+        <label for="session_id" style="font-size: 0.82rem; color: var(--text-muted);">Session:</label>
+        <select name="session_id" id="session_id" onchange="this.form.submit()" style="background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.5rem 0.85rem; font-family: inherit; font-size: 0.85rem; outline: none;">
+          {% for s in sessions %}
+          <option value="{{ s.id }}" {% if s.id == current_sess_id %}selected{% endif %}>
+            {{ s.title }} ({{ s.id }})
+          </option>
+          {% endfor %}
+        </select>
+      </form>
+
+      <a href="/api/export/attendance/{{ current_sess_id }}" class="btn btn-primary" download>
+        <i data-lucide="download" style="width: 15px; height: 15px;"></i> Export CSV
+      </a>
+    </div>
+  </div>
+
+  <!-- KPI Summary Cards -->
+  {% set present_count = attendance | selectattr('attendance_status', 'equalto', 'Present') | list | length %}
+  {% set late_count = attendance | selectattr('attendance_status', 'equalto', 'Late') | list | length %}
+  {% set absent_count = attendance | selectattr('attendance_status', 'equalto', 'Absent') | list | length %}
+  {% set total_count = attendance | length %}
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+    <div class="glass-card" style="border-left: 4px solid var(--info);">
+      <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Total Enrolled</span>
+      <h3 style="font-size: 1.8rem; font-weight: 700; margin-top: 0.25rem;">{{ total_count }}</h3>
+      <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.25rem;">Registered Students</p>
+    </div>
+
+    <div class="glass-card" style="border-left: 4px solid var(--success);">
+      <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Verified Present</span>
+      <h3 style="font-size: 1.8rem; font-weight: 700; color: #34d399; margin-top: 0.25rem;">{{ present_count }}</h3>
+      <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.25rem;">Sustained &ge; 10s presence verified</p>
+    </div>
+
+    <div class="glass-card" style="border-left: 4px solid var(--warning);">
+      <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Late Arrivals</span>
+      <h3 style="font-size: 1.8rem; font-weight: 700; color: #fbbf24; margin-top: 0.25rem;">{{ late_count }}</h3>
+      <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.25rem;">Arrived post-cutoff window</p>
+    </div>
+
+    <div class="glass-card" style="border-left: 4px solid var(--danger);">
+      <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Absent / Inactive</span>
+      <h3 style="font-size: 1.8rem; font-weight: 700; color: #f87171; margin-top: 0.25rem;">{{ absent_count }}</h3>
+      <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.25rem;">No sustained facial tracking</p>
+    </div>
+  </div>
+
+  <!-- Detailed Attendance Table -->
+  <div class="glass-card">
+    <div class="card-header-row">
+      <div class="card-title-group">
+        <div class="card-icon"><i data-lucide="users"></i></div>
+        <h2>Student Attendance Register</h2>
+      </div>
+      <input type="text" id="attendance-search" placeholder="Search by name, roll no, or status..." onkeyup="filterTable()" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: #fff; padding: 0.45rem 0.85rem; border-radius: var(--radius-sm); font-size: 0.82rem; outline: none; width: 280px;">
+    </div>
+
+    <div class="custom-table-container">
+      <table class="attendance-table" id="attendance-table-element">
+        <thead>
+          <tr>
+            <th>Student Info</th>
+            <th>Roll Number</th>
+            <th>Department</th>
+            <th>Sustained Presence</th>
+            <th>First Seen</th>
+            <th>Last Seen</th>
+            <th>Confidence</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for student in attendance %}
+          <tr>
+            <td>
+              <div style="display: flex; align-items: center;">
+                <span class="student-avatar" style="background-color: {{ student.avatar_color or '#4f46e5' }};">
+                  {{ student.name[:2].upper() }}
+                </span>
+                <div>
+                  <strong style="color: #fff; font-size: 0.9rem;">{{ student.name }}</strong>
+                  <div style="font-size: 0.72rem; color: var(--text-dim);">{{ student.id }}</div>
+                </div>
+              </div>
+            </td>
+            <td style="font-family: monospace; color: #cbd5e1;">{{ student.roll_no }}</td>
+            <td>{{ student.department }}</td>
+            <td>
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <strong style="color: #a5b4fc;">{{ (student.sustained_seconds / 60) | round(1) }}m</strong>
+                <span style="font-size: 0.72rem; color: var(--text-dim);">({{ student.sustained_seconds | round(0) }}s)</span>
+              </div>
+            </td>
+            <td style="font-size: 0.78rem; color: var(--text-muted);">
+              {% if student.first_seen %}
+                {{ student.first_seen.split('T')[1][:8] if 'T' in student.first_seen else student.first_seen }}
+              {% else %}
+                --
+              {% endif %}
+            </td>
+            <td style="font-size: 0.78rem; color: var(--text-muted);">
+              {% if student.last_seen %}
+                {{ student.last_seen.split('T')[1][:8] if 'T' in student.last_seen else student.last_seen }}
+              {% else %}
+                --
+              {% endif %}
+            </td>
+            <td>
+              <span style="font-size: 0.82rem; font-weight: 600; color: #34d399;">
+                {{ (student.confidence * 100) | round(0) }}%
+              </span>
+            </td>
+            <td>
+              {% if student.attendance_status == 'Present' %}
+                <span class="badge badge-success"><i data-lucide="check" style="width: 12px; height: 12px;"></i> Present</span>
+              {% elif student.attendance_status == 'Late' %}
+                <span class="badge badge-warning"><i data-lucide="clock" style="width: 12px; height: 12px;"></i> Late</span>
+              {% elif student.attendance_status == 'Evaluating' %}
+                <span class="badge badge-info"><i data-lucide="loader" style="width: 12px; height: 12px;"></i> Verifying</span>
+              {% else %}
+                <span class="badge badge-danger"><i data-lucide="x" style="width: 12px; height: 12px;"></i> Absent</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function filterTable() {
+    const input = document.getElementById("attendance-search");
+    const filter = input.value.toLowerCase();
+    const table = document.getElementById("attendance-table-element");
+    const tr = table.getElementsByTagName("tr");
+
+    for (let i = 1; i < tr.length; i++) {
+      const text = tr[i].textContent || tr[i].innerText;
+      if (text.toLowerCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+</script>
+{% endblock %}

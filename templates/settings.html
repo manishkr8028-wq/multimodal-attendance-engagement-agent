@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}System Settings - Multimodal Classroom Intelligence{% endblock %}
+
+{% block content %}
+<div style="max-width: 860px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem;">
+  <div class="glass-card">
+    <div class="card-header-row">
+      <div class="card-title-group">
+        <div class="card-icon"><i data-lucide="sliders"></i></div>
+        <div>
+          <h2>System Configuration & AI Model Setup</h2>
+          <p style="font-size: 0.82rem; color: var(--text-muted);">Manage Google Gemini 2.0 Flash credentials, detection thresholds, and privacy controls</p>
+        </div>
+      </div>
+    </div>
+
+    <form id="settings-form" onsubmit="saveSettings(event)" style="display: flex; flex-direction: column; gap: 1.25rem;">
+      <!-- Google Gemini Settings -->
+      <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1.25rem;">
+        <h3 style="font-size: 0.95rem; font-weight: 600; color: #a5b4fc; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i data-lucide="sparkles" style="width: 16px; height: 16px;"></i> Google Gemini Generative AI Configuration
+        </h3>
+        <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 1rem;">
+          The system uses Google Gemini 2.0 Flash for context-aware teaching recommendations and natural-language classroom analytics.
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+          <div>
+            <label for="gemini-key" style="display: block; font-size: 0.82rem; font-weight: 500; margin-bottom: 0.35rem;">
+              Google Gemini API Key
+            </label>
+            <input type="password" id="gemini-key" value="{{ gemini_key or '' }}" placeholder="AIzaSy..." style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.6rem 0.85rem; color: #fff; font-family: monospace; font-size: 0.85rem; outline: none;">
+            <span style="font-size: 0.72rem; color: var(--text-dim); margin-top: 0.25rem; display: block;">
+              Leave blank to operate in 100% offline rule-based pedagogical simulation mode.
+            </span>
+          </div>
+
+          <div>
+            <label for="gemini-model" style="display: block; font-size: 0.82rem; font-weight: 500; margin-bottom: 0.35rem;">
+              Gemini Model Version
+            </label>
+            <input type="text" id="gemini-model" value="{{ model or 'gemini-2.0-flash' }}" readonly style="width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.6rem 0.85rem; color: #94a3b8; font-family: monospace; font-size: 0.85rem; outline: none;">
+          </div>
+        </div>
+      </div>
+
+      <!-- Presence & Attendance Thresholds -->
+      <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1.25rem;">
+        <h3 style="font-size: 0.95rem; font-weight: 600; color: #34d399; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i data-lucide="shield-check" style="width: 16px; height: 16px;"></i> Multimodal Thresholds & Presence Calibration
+        </h3>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.85rem;">
+          <div>
+            <label style="display: block; font-size: 0.82rem; font-weight: 500; margin-bottom: 0.35rem;">
+              Sustained Presence Window (Seconds)
+            </label>
+            <input type="number" id="sustained-seconds" value="10" min="3" max="60" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.6rem 0.85rem; color: #fff; font-size: 0.85rem; outline: none;">
+            <span style="font-size: 0.72rem; color: var(--text-dim); margin-top: 0.25rem; display: block;">
+              Minimum duration face must persist to eliminate transient false detections.
+            </span>
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.82rem; font-weight: 500; margin-bottom: 0.35rem;">
+              Attention Confidence Cutoff (0.0 - 1.0)
+            </label>
+            <input type="number" id="attention-cutoff" value="0.60" step="0.05" min="0.2" max="0.9" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.6rem 0.85rem; color: #fff; font-size: 0.85rem; outline: none;">
+            <span style="font-size: 0.72rem; color: var(--text-dim); margin-top: 0.25rem; display: block;">
+              Gaze stability cutoff for marking attentive status.
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ethical Privacy & Offline Controls -->
+      <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1.25rem;">
+        <h3 style="font-size: 0.95rem; font-weight: 600; color: #60a5fa; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i data-lucide="lock" style="width: 16px; height: 16px;"></i> Ethical Deployment & Privacy Preserving Architecture
+        </h3>
+        <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.85rem;">
+          Designed to operate entirely offline and locally to ensure ethical compliance with learner privacy standards. No raw face footage is stored permanently.
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 0.65rem;">
+          <label style="display: flex; align-items: center; gap: 0.65rem; font-size: 0.85rem; cursor: pointer;">
+            <input type="checkbox" id="offline-mode-toggle" checked style="accent-color: var(--accent-primary); width: 16px; height: 16px;">
+            <span>Enable Local Edge Inference (Runs offline without external cloud dependencies)</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 0.65rem; font-size: 0.85rem; cursor: pointer;">
+            <input type="checkbox" id="anonymize-logs-toggle" checked style="accent-color: var(--accent-primary); width: 16px; height: 16px;">
+            <span>Anonymize student telemetry in exported audit registers</span>
+          </label>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 0.5rem;">
+        <button type="submit" class="btn btn-primary">
+          <i data-lucide="save" style="width: 15px; height: 15px;"></i> Save System Configuration
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  async function saveSettings(e) {
+    e.preventDefault();
+    const key = document.getElementById('gemini-key').value;
+    try {
+      const res = await fetch('/api/settings/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gemini_key: key })
+      });
+      const data = await res.json();
+      alert('Settings successfully updated!');
+    } catch (err) {
+      alert('Error updating settings.');
+    }
+  }
+</script>
+{% endblock %}

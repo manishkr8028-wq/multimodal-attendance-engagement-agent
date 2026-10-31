@@ -1,0 +1,146 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 620" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0f1d"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="primaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#4f46e5"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ec4899"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1100" height="620" rx="16" fill="url(#bgGrad)" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
+
+  <!-- Title Header -->
+  <text x="40" y="48" fill="#ffffff" font-family="Outfit, sans-serif" font-size="22" font-weight="700">Technical Architecture: Multimodal Attendance &amp; Engagement Agent</text>
+  <text x="40" y="74" fill="#94a3b8" font-family="Inter, sans-serif" font-size="13">End-to-End System Diagram &bull; Generative AI with Google Cloud &bull; Privacy-Preserving Classroom Intelligence</text>
+
+  <!-- 1. Frontend Layer -->
+  <g transform="translate(40, 110)">
+    <rect width="220" height="340" rx="12" fill="url(#cardGrad)" stroke="#3b82f6" stroke-width="1.5" filter="url(#shadow)"/>
+    <rect width="220" height="36" rx="12" fill="#1e3a8a"/>
+    <text x="110" y="24" text-anchor="middle" fill="#ffffff" font-family="Outfit, sans-serif" font-size="14" font-weight="700">Frontend Layer</text>
+
+    <!-- Components -->
+    <rect x="20" y="55" width="180" height="50" rx="8" fill="#1e293b" stroke="rgba(255,255,255,0.1)"/>
+    <text x="110" y="85" text-anchor="middle" fill="#e2e8f0" font-family="Inter, sans-serif" font-size="13">HTML5 Templates</text>
+
+    <rect x="20" y="120" width="180" height="50" rx="8" fill="#1e293b" stroke="rgba(255,255,255,0.1)"/>
+    <text x="110" y="150" text-anchor="middle" fill="#e2e8f0" font-family="Inter, sans-serif" font-size="13">CSS3 Styling (Glassmorphism)</text>
+
+    <rect x="20" y="185" width="180" height="50" rx="8" fill="#1e293b" stroke="rgba(255,255,255,0.1)"/>
+    <text x="110" y="215" text-anchor="middle" fill="#e2e8f0" font-family="Inter, sans-serif" font-size="13">JavaScript Controllers (HUD)</text>
+
+    <rect x="20" y="250" width="180" height="50" rx="8" fill="#1e293b" stroke="rgba(255,255,255,0.1)"/>
+    <text x="110" y="280" text-anchor="middle" fill="#60a5fa" font-family="Inter, sans-serif" font-size="13" font-weight="600">Web Browser / Client</text>
+  </g>
+
+  <!-- Connectors -->
+  <path d="M 260 280 L 320 280" stroke="#6366f1" stroke-width="2.5" stroke-dasharray="4,4"/>
+
+  <!-- 2. Backend & Gateway Layer -->
+  <g transform="translate(320, 110)">
+    <rect width="250" height="340" rx="12" fill="url(#cardGrad)" stroke="#6366f1" stroke-width="1.5" filter="url(#shadow)"/>
+    <rect width="250" height="36" rx="12" fill="#4338ca"/>
+    <text x="125" y="24" text-anchor="middle" fill="#ffffff" font-family="Outfit, sans-serif" font-size="14" font-weight="700">Flask API Gateway &amp; Handlers</text>
+
+    <rect x="20" y="52" width="210" height="42" rx="8" fill="#1e293b" stroke="rgba(255,255,255,0.1)"/>
+    <text x="125" y="78" text-anchor="middle" fill="#c7d2fe" font-family="Inter, sans-serif" font-size="12" font-weight="600">Flask API Gateway</text>
+
+    <rect x="20" y="104" width="210" height="42" rx="8" fill="#1e293b" stroke="rgba(255,255,255,0.1)"/>
+    <text x="125" y="130" text-anchor="middle" fill="#e2e8f0" font-family="Inter, sans-serif" font-size="12">Route Handlers (REST)</text>
+
+    <rect x="20" y="156" width="210" height="42" rx="8" fill="#1e293b" stroke="rgba(255,255,255,0.1)"/>
+    <text x="125" y="182" text-anchor="middle" fill="#e2e8f0" font-family="Inter, sans-serif" font-size="12">Vision &amp; Sustained Presence Utils</text>
+
+    <rect x="20" y="208" width="210" height="42" rx="8" fill="#1e293b" stroke="rgba(255,255,255,0.1)"/>
+    <text x="125" y="234" text-anchor="middle" fill="#e2e8f0" font-family="Inter, sans-serif" font-size="12">Audio Utils (RMS &amp; VAD)</text>
+
+    <rect x="20" y="260" width="210" height="42" rx="8" fill="#1e293b" stroke="rgba(255,255,255,0.1)"/>
+    <text x="125" y="286" text-anchor="middle" fill="#e2e8f0" font-family="Inter, sans-serif" font-size="12">Multimodal Signal Fusion Engine</text>
+  </g>
+
+  <!-- Connectors -->
+  <path d="M 570 280 L 630 280" stroke="#ec4899" stroke-width="2.5" stroke-dasharray="4,4"/>
+
+  <!-- 3. AI Service Layer -->
+  <g transform="translate(630, 110)">
+    <rect width="240" height="340" rx="12" fill="url(#cardGrad)" stroke="#ec4899" stroke-width="1.5" filter="url(#shadow)"/>
+    <rect width="240" height="36" rx="12" fill="#be185d"/>
+    <text x="120" y="24" text-anchor="middle" fill="#ffffff" font-family="Outfit, sans-serif" font-size="14" font-weight="700">AI Service Layer</text>
+
+    <rect x="20" y="52" width="200" height="48" rx="8" fill="#2e1065" stroke="#a855f7" stroke-width="1.2"/>
+    <text x="120" y="81" text-anchor="middle" fill="#f5d0fe" font-family="Outfit, sans-serif" font-size="13" font-weight="700">Google Gemini 2.0 Flash</text>
+
+    <rect x="20" y="112" width="200" height="44" rx="8" fill="#1e293b" stroke="rgba(255,255,255,0.1)"/>
+    <text x="120" y="139" text-anchor="middle" fill="#e2e8f0" font-family="Inter, sans-serif" font-size="12">Pedagogical Suggestion Engine</text>
+
+    <rect x="20" y="168" width="200" height="44" rx="8" fill="#1e293b" stroke="rgba(255,255,255,0.1)"/>
+    <text x="120" y="195" text-anchor="middle" fill="#e2e8f0" font-family="Inter, sans-serif" font-size="12">Conversational Assistant Chat</text>
+
+    <rect x="20" y="224" width="200" height="44" rx="8" fill="#1e293b" stroke="rgba(255,255,255,0.1)"/>
+    <text x="120" y="251" text-anchor="middle" fill="#e2e8f0" font-family="Inter, sans-serif" font-size="12">Offline Rule Pedagogical Expert</text>
+
+    <rect x="20" y="280" width="200" height="44" rx="8" fill="#1e293b" stroke="rgba(255,255,255,0.1)"/>
+    <text x="120" y="307" text-anchor="middle" fill="#e2e8f0" font-family="Inter, sans-serif" font-size="12">Session Summary Synthesizer</text>
+  </g>
+
+  <!-- Connectors -->
+  <path d="M 870 280 L 910 280" stroke="#10b981" stroke-width="2.5"/>
+
+  <!-- 4. Storage & Utility Layer -->
+  <g transform="translate(910, 110)">
+    <rect width="150" height="340" rx="12" fill="url(#cardGrad)" stroke="#10b981" stroke-width="1.5" filter="url(#shadow)"/>
+    <rect width="150" height="36" rx="12" fill="#065f46"/>
+    <text x="75" y="24" text-anchor="middle" fill="#ffffff" font-family="Outfit, sans-serif" font-size="13" font-weight="700">Storage Layer</text>
+
+    <rect x="15" y="55" width="120" height="48" rx="8" fill="#1e293b" stroke="rgba(255,255,255,0.1)"/>
+    <text x="75" y="76" text-anchor="middle" fill="#a7f3d0" font-family="Inter, sans-serif" font-size="11" font-weight="600">SQLite Database</text>
+    <text x="75" y="92" text-anchor="middle" fill="#6ee7b7" font-family="Inter, sans-serif" font-size="10">Attendance Logs</text>
+
+    <rect x="15" y="118" width="120" height="48" rx="8" fill="#1e293b" stroke="rgba(255,255,255,0.1)"/>
+    <text x="75" y="139" text-anchor="middle" fill="#a7f3d0" font-family="Inter, sans-serif" font-size="11" font-weight="600">Engagement DB</text>
+    <text x="75" y="155" text-anchor="middle" fill="#6ee7b7" font-family="Inter, sans-serif" font-size="10">Time Series</text>
+
+    <rect x="15" y="180" width="120" height="48" rx="8" fill="#1e293b" stroke="rgba(255,255,255,0.1)"/>
+    <text x="75" y="201" text-anchor="middle" fill="#a7f3d0" font-family="Inter, sans-serif" font-size="11" font-weight="600">Generated CSV</text>
+    <text x="75" y="217" text-anchor="middle" fill="#6ee7b7" font-family="Inter, sans-serif" font-size="10">Audit Registers</text>
+
+    <rect x="15" y="242" width="120" height="48" rx="8" fill="#1e293b" stroke="rgba(255,255,255,0.1)"/>
+    <text x="75" y="263" text-anchor="middle" fill="#a7f3d0" font-family="Inter, sans-serif" font-size="11" font-weight="600">Session JSON</text>
+    <text x="75" y="279" text-anchor="middle" fill="#6ee7b7" font-family="Inter, sans-serif" font-size="10">Full Audit File</text>
+  </g>
+
+  <!-- Bottom Badges / Features -->
+  <g transform="translate(40, 480)">
+    <rect width="1020" height="95" rx="12" fill="rgba(30, 41, 59, 0.4)" stroke="rgba(255,255,255,0.08)"/>
+    <text x="25" y="32" fill="#818cf8" font-family="Outfit, sans-serif" font-size="13" font-weight="700">CORE SYSTEM GUARANTEES &amp; INNOVATIONS</text>
+
+    <text x="25" y="62" fill="#cbd5e1" font-family="Inter, sans-serif" font-size="12">
+      &bull; <tspan font-weight="600" fill="#ffffff">Sustained Presence Verification:</tspan> Prevents transient passersby from triggering false attendance check-ins.
+    </text>
+    <text x="25" y="80" fill="#cbd5e1" font-family="Inter, sans-serif" font-size="12">
+      &bull; <tspan font-weight="600" fill="#ffffff">Multimodal Signal Fusion:</tspan> Fuses visual attention (head pose pitch/yaw) with acoustic energy and temporal dynamics.
+    </text>
+
+    <text x="540" y="62" fill="#cbd5e1" font-family="Inter, sans-serif" font-size="12">
+      &bull; <tspan font-weight="600" fill="#ffffff">Gemini 2.0 Flash Pedagogical Agent:</tspan> Context-aware teaching suggestions &amp; interactive decision support.
+    </text>
+    <text x="540" y="80" fill="#cbd5e1" font-family="Inter, sans-serif" font-size="12">
+      &bull; <tspan font-weight="600" fill="#ffffff">Privacy-Preserving Edge Architecture:</tspan> Operates fully offline without cloud dependencies or raw video storage.
+    </text>
+  </g>
+</svg>

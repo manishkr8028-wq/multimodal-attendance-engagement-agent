@@ -1,0 +1,40 @@
+{
+  "project": "Multimodal Attendance & Engagement Agent",
+  "program": "Generative AI with Google Cloud",
+  "version": "1.0.0",
+  "author": "Manish Kumar",
+  "scenarios": [
+    {
+      "id": "scenario_1",
+      "name": "Automated Attendance Tracking",
+      "description": "Marks attendance based on sustained presence rather than single-frame detection, eliminating false positives caused by passersby.",
+      "sustained_threshold_seconds": 10,
+      "benchmark_accuracy": 0.965
+    },
+    {
+      "id": "scenario_2",
+      "name": "Engagement and Session Dynamics Analysis",
+      "description": "Continuously analyzes behavioral indicators (head pose, movement, inactivity, acoustic energy) to generate temporal engagement trends.",
+      "sampling_rate_seconds": 1.5,
+      "multimodal_weights": {
+        "visual_attention": 0.65,
+        "vocal_activity": 0.35
+      }
+    },
+    {
+      "id": "scenario_3",
+      "name": "AI-Driven Teaching Suggestions",
+      "description": "Context-aware assistive pedagogical suggestions powered by Google Gemini 2.0 Flash to assist instructors in pacing calibration and interactivity.",
+      "model": "gemini-2.0-flash",
+      "offline_mode_supported": true
+    }
+  ],
+  "epics_completed": [
+    "EPIC 1: Requirements Specification and Environment Setup",
+    "EPIC 2: Vision Module Development",
+    "EPIC 3: Audio Module Development",
+    "EPIC 4: AI IMPLEMENTATION",
+    "EPIC 5: Analytics and Recommendation Engine",
+    "EPIC 6: Interface, Testing, and Deployment"
+  ]
+}

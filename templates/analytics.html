@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+
+{% block title %}Session Engagement Analytics - Multimodal Classroom Intelligence{% endblock %}
+
+{% block content %}
+<div style="display: flex; flex-direction: column; gap: 1.5rem;">
+  <!-- Header with Session Selector & Export Actions -->
+  <div class="glass-card" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h2 style="font-size: 1.25rem; font-weight: 700;">Multimodal Engagement & Session Dynamics Analytics</h2>
+      <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.25rem;">
+        Fusing head pose, gaze orientation, inactivity duration, and acoustic energy into temporal classroom dynamics.
+      </p>
+    </div>
+
+    <div style="display: flex; gap: 0.75rem; align-items: center;">
+      <!-- Session selector dropdown -->
+      <form method="GET" action="/analytics" style="display: flex; align-items: center; gap: 0.5rem;">
+        <label for="session_id" style="font-size: 0.82rem; color: var(--text-muted);">Session:</label>
+        <select name="session_id" id="session_id" onchange="this.form.submit()" style="background: rgba(255,255,255,0.06); color: #fff; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.5rem 0.85rem; font-family: inherit; font-size: 0.85rem; outline: none;">
+          {% for s in sessions %}
+          <option value="{{ s.id }}" {% if s.id == current_sess_id %}selected{% endif %}>
+            {{ s.title }} ({{ s.id }})
+          </option>
+          {% endfor %}
+        </select>
+      </form>
+
+      <a href="/api/export/engagement/{{ current_sess_id }}" class="btn btn-secondary" download>
+        <i data-lucide="file-spreadsheet" style="width: 15px; height: 15px;"></i> Export Timeline CSV
+      </a>
+      <a href="/api/export/json/{{ current_sess_id }}" class="btn btn-primary" download>
+        <i data-lucide="file-code" style="width: 15px; height: 15px;"></i> Audit JSON
+      </a>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  {% set summary = data.summary %}
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+    <div class="glass-card" style="border-left: 4px solid var(--accent-primary);">
+      <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Average Engagement</span>
+      <h3 style="font-size: 1.8rem; font-weight: 700; color: #a5b4fc; margin-top: 0.25rem;">{{ summary.avg_engagement }}%</h3>
+      <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.25rem;">Cohort Multimodal Mean</p>
+    </div>
+
+    <div class="glass-card" style="border-left: 4px solid var(--success);">
+      <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Peak Engagement</span>
+      <h3 style="font-size: 1.8rem; font-weight: 700; color: #34d399; margin-top: 0.25rem;">{{ summary.peak_engagement }}%</h3>
+      <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.25rem;">Recorded at Minute {{ summary.peak_minute }}m</p>
+    </div>
+
+    <div class="glass-card" style="border-left: 4px solid var(--warning);">
+      <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Attention Dip (Lowest)</span>
+      <h3 style="font-size: 1.8rem; font-weight: 700; color: #fbbf24; margin-top: 0.25rem;">{{ summary.lowest_engagement }}%</h3>
+      <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.25rem;">Pacing Dip at Minute {{ summary.low_minute }}m</p>
+    </div>
+
+    <div class="glass-card" style="border-left: 4px solid var(--info);">
+      <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Acoustic Activity Mean</span>
+      <h3 style="font-size: 1.8rem; font-weight: 700; color: #60a5fa; margin-top: 0.25rem;">{{ summary.avg_vocal }}%</h3>
+      <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.25rem;">Verbal & Discussion Energy</p>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;">
+    <!-- Main Timeline Line Chart -->
+    <div class="glass-card">
+      <div class="card-header-row">
+        <div class="card-title-group">
+          <div class="card-icon"><i data-lucide="trending-up"></i></div>
+          <h2>Session Engagement Dynamics Timeline</h2>
+        </div>
+        <div style="display: flex; gap: 0.75rem; font-size: 0.75rem;">
+          <span style="color: #6366f1;">&bull; Overall Engagement</span>
+          <span style="color: #10b981;">&bull; Visual Attention</span>
+          <span style="color: #ec4899;">&bull; Vocal Activity</span>
+        </div>
+      </div>
+      <div style="position: relative; height: 320px; width: 100%;">
+        <canvas id="session-timeline-chart"></canvas>
+      </div>
+    </div>
+
+    <!-- Engagement Tier Doughnut Chart -->
+    <div class="glass-card">
+      <div class="card-header-row">
+        <div class="card-title-group">
+          <div class="card-icon"><i data-lucide="pie-chart"></i></div>
+          <h2>Attention Tiers</h2>
+        </div>
+      </div>
+      <div style="position: relative; height: 260px; width: 100%; display: flex; align-items: center; justify-content: center;">
+        <canvas id="engagement-tiers-chart"></canvas>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.75rem; font-size: 0.75rem; text-align: center;">
+        <div style="background: rgba(255,255,255,0.03); padding: 0.4rem; border-radius: 4px;">
+          <span style="color: #34d399;">Optimal:</span> {{ summary.engagement_distribution.optimal }}%
+        </div>
+        <div style="background: rgba(255,255,255,0.03); padding: 0.4rem; border-radius: 4px;">
+          <span style="color: #60a5fa;">Attentive:</span> {{ summary.engagement_distribution.attentive }}%
+        </div>
+        <div style="background: rgba(255,255,255,0.03); padding: 0.4rem; border-radius: 4px;">
+          <span style="color: #fbbf24;">Moderate:</span> {{ summary.engagement_distribution.moderate }}%
+        </div>
+        <div style="background: rgba(255,255,255,0.03); padding: 0.4rem; border-radius: 4px;">
+          <span style="color: #f87171;">Disengaged:</span> {{ summary.engagement_distribution.disengaged }}%
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Attention Drops & Critical Event Logs -->
+  <div class="glass-card">
+    <div class="card-header-row">
+      <div class="card-title-group">
+        <div class="card-icon"><i data-lucide="alert-triangle"></i></div>
+        <h2>Classroom Anomaly & Key Moment Events</h2>
+      </div>
+    </div>
+
+    <div class="custom-table-container">
+      <table class="attendance-table">
+        <thead>
+          <tr>
+            <th>Time Offset</th>
+            <th>Overall Score</th>
+            <th>Visual Gaze</th>
+            <th>Vocal RMS</th>
+            <th>Head Pose Angle</th>
+            <th>Event Classification</th>
+            <th>Recommended Teacher Response</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for pt in data.timeline %}
+            {% if pt.alert_flag != 'Normal' %}
+            <tr>
+              <td style="font-weight: 600; color: #a5b4fc;">{{ (pt.elapsed_seconds / 60) | round(1) }}m ({{ pt.elapsed_seconds }}s)</td>
+              <td><strong style="color: #fff;">{{ pt.overall_score }}%</strong></td>
+              <td>{{ pt.visual_attention }}%</td>
+              <td>{{ pt.vocal_activity }}%</td>
+              <td style="font-family: monospace; font-size: 0.8rem;">P: {{ pt.head_pitch }}° / Y: {{ pt.head_yaw }}°</td>
+              <td>
+                {% if pt.alert_flag == 'Attention Drop' %}
+                  <span class="badge badge-warning"><i data-lucide="trending-down" style="width: 12px; height: 12px;"></i> Attention Drop</span>
+                {% elif pt.alert_flag == 'Active Discussion' or pt.alert_flag == 'High Discussion Peak' %}
+                  <span class="badge badge-success"><i data-lucide="message-square" style="width: 12px; height: 12px;"></i> Discussion Surge</span>
+                {% else %}
+                  <span class="badge badge-info">{{ pt.alert_flag }}</span>
+                {% endif %}
+              </td>
+              <td style="font-size: 0.82rem; color: #cbd5e1;">
+                {% if pt.alert_flag == 'Attention Drop' %}
+                  Trigger quick concept check or shift from lecture to practical demonstration.
+                {% elif pt.alert_flag == 'Active Discussion' or pt.alert_flag == 'High Discussion Peak' %}
+                  Summarize key points on slide and synthesize consensus before continuing.
+                {% else %}
+                  Continue standard pacing with regular check-ins.
+                {% endif %}
+              </td>
+            </tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Pass server data into Chart.js
+  const rawTimeline = {{ data.timeline | tojson }};
+  const distributionData = {{ data.summary.engagement_distribution | tojson }};
+
+  // Render Line Timeline Chart
+  const ctxTimeline = document.getElementById('session-timeline-chart').getContext('2d');
+  const labels = rawTimeline.map(pt => `${Math.round(pt.elapsed_seconds / 60)}m`);
+  const scores = rawTimeline.map(pt => pt.overall_score);
+  const visuals = rawTimeline.map(pt => pt.visual_attention);
+  const vocals = rawTimeline.map(pt => pt.vocal_activity);
+
+  new Chart(ctxTimeline, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Overall Engagement (%)',
+          data: scores,
+          borderColor: '#6366f1',
+          backgroundColor: 'rgba(99, 102, 241, 0.1)',
+          fill: true,
+          tension: 0.35,
+          borderWidth: 2.5,
+          pointRadius: 2
+        },
+        {
+          label: 'Visual Attention (%)',
+          data: visuals,
+          borderColor: '#10b981',
+          borderDash: [4, 4],
+          tension: 0.35,
+          borderWidth: 1.8,
+          pointRadius: 0
+        },
+        {
+          label: 'Vocal Activity (%)',
+          data: vocals,
+          borderColor: '#ec4899',
+          borderDash: [2, 2],
+          tension: 0.35,
+          borderWidth: 1.8,
+          pointRadius: 0
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          grid: { color: 'rgba(255, 255, 255, 0.05)' },
+          ticks: { color: '#94a3b8' }
+        },
+        y: {
+          min: 0,
+          max: 100,
+          grid: { color: 'rgba(255, 255, 255, 0.05)' },
+          ticks: { color: '#94a3b8' }
+        }
+      },
+      plugins: {
+        legend: { display: false }
+      }
+    }
+  });
+
+  // Render Doughnut Chart for Tiers
+  const ctxTiers = document.getElementById('engagement-tiers-chart').getContext('2d');
+  new Chart(ctxTiers, {
+    type: 'doughnut',
+    data: {
+      labels: ['Optimal (≥78%)', 'Attentive (60-77%)', 'Moderate (45-59%)', 'Disengaged (<45%)'],
+      datasets: [{
+        data: [
+          distributionData.optimal || 40,
+          distributionData.attentive || 35,
+          distributionData.moderate || 15,
+          distributionData.disengaged || 10
+        ],
+        backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'],
+        borderWidth: 0,
+        hoverOffset: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { color: '#94a3b8', font: { size: 11 } }
+        }
+      },
+      cutout: '72%'
+    }
+  });
+</script>
+{% endblock %}

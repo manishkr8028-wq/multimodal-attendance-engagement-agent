@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}Live Classroom Monitor - Multimodal Attendance & Engagement Agent{% endblock %}
+
+{% block content %}
+<div class="monitor-grid">
+  <!-- Left Column: Video Stage & Live HUD -->
+  <div class="glass-card">
+    <div class="card-header-row">
+      <div class="card-title-group">
+        <div class="card-icon"><i data-lucide="camera"></i></div>
+        <div>
+          <h2>Live Classroom Intelligence HUD</h2>
+          <p style="font-size: 0.78rem; color: var(--text-muted);">Real-time Face Detection, Sustained Presence & Head Pose Analysis</p>
+        </div>
+      </div>
+      <div style="display: flex; gap: 0.5rem;">
+        <button id="toggle-sim-btn" class="btn btn-secondary" style="font-size: 0.78rem;" title="Simulate classroom feed if webcam is unavailable">
+          <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i> Demo Simulation
+        </button>
+      </div>
+    </div>
+
+    <!-- Video Stage Container -->
+    <div class="video-stage-container">
+      <video id="camera-video" autoplay playsinline muted></video>
+      <canvas id="hud-canvas"></canvas>
+
+      <!-- Video HUD Header Overlay -->
+      <div class="video-overlay-header">
+        <div class="hud-pill">
+          <span class="pulse-dot" style="width: 6px; height: 6px;"></span>
+          <span id="hud-fps-indicator">HUD 30 FPS</span>
+        </div>
+        <div class="hud-pill" id="sustained-timer-badge">
+          <i data-lucide="timer" style="width: 13px; height: 13px;"></i>
+          <span>Presence Window: <strong id="hud-presence-val">0.0s</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Session Controls -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 0.85rem; border-top: 1px solid var(--border-color);">
+      <div style="display: flex; gap: 0.65rem;">
+        <button id="start-session-btn" class="btn btn-primary">
+          <i data-lucide="play" style="width: 15px; height: 15px;"></i> Start Session
+        </button>
+        <button id="pause-session-btn" class="btn btn-secondary" disabled>
+          <i data-lucide="pause" style="width: 15px; height: 15px;"></i> Pause
+        </button>
+        <button id="end-session-btn" class="btn btn-danger" disabled>
+          <i data-lucide="square" style="width: 15px; height: 15px;"></i> Finalize Session
+        </button>
+      </div>
+      <div style="font-size: 0.82rem; color: var(--text-muted);">
+        Session ID: <span id="current-session-id" style="font-family: monospace; color: #a5b4fc;">sess_demo_2026</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column: Real-Time Multimodal Telemetry & AI Suggestions -->
+  <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+    <!-- Circular Engagement Gauge Card -->
+    <div class="glass-card gauge-metric-card">
+      <div class="card-header-row" style="width: 100%; margin-bottom: 0.5rem;">
+        <div class="card-title-group">
+          <div class="card-icon"><i data-lucide="activity"></i></div>
+          <h2 style="font-size: 0.95rem;">Fused Engagement Index</h2>
+        </div>
+        <span class="badge badge-success" id="engagement-level-badge">Optimal (82%)</span>
+      </div>
+
+      <div class="circular-gauge-wrapper">
+        <svg class="circular-gauge-svg" viewBox="0 0 160 160">
+          <defs>
+            <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ec4899" />
+              <stop offset="50%" stop-color="#8b5cf6" />
+              <stop offset="100%" stop-color="#6366f1" />
+            </linearGradient>
+          </defs>
+          <circle class="gauge-bg-circle" cx="80" cy="80" r="70" />
+          <circle class="gauge-fill-circle" id="gauge-circle-meter" cx="80" cy="80" r="70" />
+        </svg>
+        <div class="gauge-center-content">
+          <span class="gauge-score-value" id="live-engagement-number">82</span>
+          <span class="gauge-score-label">Index Score</span>
+        </div>
+      </div>
+
+      <!-- Audio Level Waveform Visualizer -->
+      <div style="width: 100%; text-align: left; margin-top: 0.5rem;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.74rem; color: var(--text-muted); margin-bottom: 0.25rem;">
+          <span>Classroom Acoustic Energy (Vocal Level)</span>
+          <span id="audio-state-text" style="color: #818cf8; font-weight: 600;">Active Speech</span>
+        </div>
+        <div class="audio-visualizer-container" id="audio-waveform-bars">
+          <!-- Render 24 audio bars -->
+          {% for i in range(24) %}
+          <div class="audio-bar" style="height: {{ (i * 7) % 35 + 8 }}px;"></div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Telemetry Subgrid -->
+      <div class="telemetry-subgrid">
+        <div class="telemetry-tile">
+          <span class="metric-title"><i data-lucide="users" style="width: 13px; height: 13px; vertical-align: middle;"></i> Faces Detected</span>
+          <span class="metric-val" id="metric-faces-val">1</span>
+        </div>
+        <div class="telemetry-tile">
+          <span class="metric-title"><i data-lucide="eye" style="width: 13px; height: 13px; vertical-align: middle;"></i> Visual Attention</span>
+          <span class="metric-val" id="metric-visual-val">84%</span>
+        </div>
+        <div class="telemetry-tile">
+          <span class="metric-title"><i data-lucide="mic" style="width: 13px; height: 13px; vertical-align: middle;"></i> Vocal Activity</span>
+          <span class="metric-val" id="metric-vocal-val">68%</span>
+        </div>
+        <div class="telemetry-tile">
+          <span class="metric-title"><i data-lucide="compass" style="width: 13px; height: 13px; vertical-align: middle;"></i> Head Pose</span>
+          <span class="metric-val" id="metric-pose-val" style="font-size: 0.95rem; line-height: 1.5;">P: 0.5° / Y: 1.2°</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI-Driven Teaching Suggestions Feed -->
+    <div class="glass-card" style="flex: 1;">
+      <div class="card-header-row">
+        <div class="card-title-group">
+          <div class="card-icon" style="background: rgba(236, 72, 153, 0.15); color: #f472b6;">
+            <i data-lucide="sparkles"></i>
+          </div>
+          <div>
+            <h2 style="font-size: 0.95rem;">AI Teaching Suggestions</h2>
+            <p style="font-size: 0.72rem; color: var(--text-muted);">Real-Time Context-Aware Interventions</p>
+          </div>
+        </div>
+        <button id="trigger-ai-btn" class="btn btn-secondary" style="padding: 0.35rem 0.65rem; font-size: 0.74rem;">
+          <i data-lucide="zap" style="width: 13px; height: 13px;"></i> Request Suggestion
+        </button>
+      </div>
+
+      <div class="suggestions-feed" id="suggestions-container">
+        <!-- Default sample suggestion card -->
+        <div class="suggestion-card">
+          <div class="suggestion-header">
+            <span class="category-tag">Pacing & Interactivity</span>
+            <span class="time-tag">Just now</span>
+          </div>
+          <p class="suggestion-text">Sustained attention is strong. Students are following the architecture walkthrough with high visual retention.</p>
+          <div class="action-item-pill">
+            <i data-lucide="check-circle-2" style="width: 13px; height: 13px;"></i>
+            <span>Action: Ask student in row 2 to explain the multimodal fusion formula.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Session Finalize Summary -->
+<div id="session-summary-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); z-index: 2000; align-items: center; justify-content: center;">
+  <div class="glass-card" style="max-width: 550px; width: 90%; background: #111827; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 20px 40px rgba(0,0,0,0.6);">
+    <div class="card-header-row">
+      <div class="card-title-group">
+        <div class="card-icon"><i data-lucide="award"></i></div>
+        <h2>Session Completed</h2>
+      </div>
+      <button class="btn btn-secondary" onclick="closeSummaryModal()" style="padding: 0.3rem 0.6rem;">&times;</button>
+    </div>
+    <div style="padding: 1rem 0;">
+      <p style="font-size: 0.9rem; color: #cbd5e1; margin-bottom: 1rem;">The classroom session has concluded. Sustained attendance logs and engagement timelines have been committed to SQLite database.</p>
+      <div class="telemetry-subgrid" style="margin-bottom: 1.5rem;">
+        <div class="telemetry-tile">
+          <span class="metric-title">Average Engagement</span>
+          <span class="metric-val" id="modal-avg-eng" style="color: #34d399;">81.2%</span>
+        </div>
+        <div class="telemetry-tile">
+          <span class="metric-title">Attendance Verified</span>
+          <span class="metric-val" id="modal-att-cnt" style="color: #60a5fa;">7 / 8</span>
+        </div>
+      </div>
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+        <a href="/attendance" class="btn btn-secondary"><i data-lucide="clipboard-check" style="width: 14px; height: 14px;"></i> View Attendance</a>
+        <a href="/analytics" class="btn btn-primary"><i data-lucide="bar-chart" style="width: 14px; height: 14px;"></i> View Full Analytics</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/camera_stream.js') }}"></script>
+<script src="{{ url_for('static', filename='js/audio_stream.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% endblock %}
