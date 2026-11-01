@@ -25,6 +25,9 @@ class CameraHUDController {
       simBtn.addEventListener('click', () => this.toggleSimulationMode());
     }
 
+    if (this.video) {
+      this.video.addEventListener('loadedmetadata', () => this.resizeCanvas());
+    }
     window.addEventListener('resize', () => this.resizeCanvas());
   }
 
@@ -36,10 +39,17 @@ class CameraHUDController {
 
   async startCamera() {
     try {
-      this.stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: { ideal: 1280 }, height: { ideal: 720 } },
-        audio: false
-      });
+      try {
+        this.stream = await navigator.mediaDevices.getUserMedia({
+          video: { width: { ideal: 1280 }, height: { ideal: 720 } },
+          audio: false
+        });
+      } catch (constraintErr) {
+        this.stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: false
+        });
+      }
       this.video.srcObject = this.stream;
       await this.video.play();
       this.isStreaming = true;
