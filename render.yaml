@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: multimodal-attendance-agent
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: ENABLE_OFFLINE_MODE
+        value: "True"

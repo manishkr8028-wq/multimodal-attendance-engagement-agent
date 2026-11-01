@@ -8,10 +8,11 @@
 ![Google Gemini](https://img.shields.io/badge/Google_Gemini-2.0_Flash-orange?logo=google&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 ![Program](https://img.shields.io/badge/Program-Generative_AI_with_Google_Cloud-indigo)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/manishkr8028-wq/multimodal-attendance-engagement-agent)
 
 **An AI-powered, privacy-preserving classroom intelligence system integrating Computer Vision, Audio Signal Processing, and Gemini 2.0 Flash agent-based reasoning for automated attendance and real-time engagement analytics.**
 
-[Live Monitor](#live-monitor-hud) • [Architecture](#technical-architecture) • [Core Scenarios](#core-scenarios) • [Epics Breakdown](#project-workflow--epics) • [Quick Start](#quick-start-guide) • [API Documentation](#rest-api-documentation)
+[Live Monitor](#live-monitor-hud) • [Architecture](#technical-architecture) • [Core Scenarios](#core-scenarios) • [Epics Breakdown](#project-workflow--epics) • [Quick Start](#quick-start-guide) • [Cloud Deployment](#-free-1-click-cloud-deployment-demo-link) • [API Documentation](#rest-api-documentation)
 
 ---
 
@@ -192,6 +193,21 @@ Simply double-click `run.bat` or run:
 python app.py
 ```
 Open your browser to: **[http://localhost:5000](http://localhost:5000)**
+
+---
+
+## 🚀 Free 1-Click Cloud Deployment (Demo Link)
+
+To get a **ready-made live demo link** (hosted online 24/7 so anyone can open your project directly in their browser without installing anything):
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/manishkr8028-wq/multimodal-attendance-engagement-agent)
+
+### Steps to get your Demo Link on Render:
+1. Click the **Deploy to Render** button above (or sign in to [render.com](https://render.com) using your GitHub account).
+2. Click **New +** $\rightarrow$ **Web Service** $\rightarrow$ Connect your repository `multimodal-attendance-engagement-agent`.
+3. Render automatically detects `render.yaml` and starts building.
+4. Within 2 minutes, Render provides your permanent public URL (e.g., `https://multimodal-attendance-agent.onrender.com`).
+5. Copy this URL and submit it as your **Demo Link**!
 
 ---
 
