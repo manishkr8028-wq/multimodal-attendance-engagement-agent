@@ -63,10 +63,8 @@ class MultimodalApp {
   }
 
   checkAutoStart() {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('autostart') === 'true') {
-      setTimeout(() => this.startSession(), 600);
-    }
+    // Always auto-start: open camera and begin face detection immediately
+    setTimeout(() => this.startSession(), 800);
   }
 
   async startSession() {
