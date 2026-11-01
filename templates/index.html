@@ -22,7 +22,7 @@
     </div>
 
     <!-- Video Stage Container -->
-    <div class="video-stage-container">
+    <div class="video-stage-container" id="video-stage-box">
       <video id="camera-video" autoplay playsinline muted></video>
       <canvas id="hud-canvas"></canvas>
 
@@ -36,6 +36,28 @@
           <i data-lucide="timer" style="width: 13px; height: 13px;"></i>
           <span>Presence Window: <strong id="hud-presence-val">0.0s</strong></span>
         </div>
+      </div>
+
+      <!-- Prominent 1-Click Camera Activation Overlay -->
+      <div id="camera-start-overlay" class="camera-start-overlay">
+        <div class="camera-start-backdrop">
+          <div class="camera-start-icon-ring">
+            <i data-lucide="video" style="width: 28px; height: 28px; color: #818cf8;"></i>
+          </div>
+          <h3 style="font-size: 1.12rem; font-weight: 700; margin-bottom: 0.35rem; color: #ffffff;">Live Attendance Verification</h3>
+          <p style="font-size: 0.8rem; color: #94a3b8; max-width: 320px; margin-bottom: 1.15rem; line-height: 1.4;">
+            Open your camera to test face detection, sustained presence verification, and attention tracking.
+          </p>
+          <button id="camera-overlay-start-btn" class="btn btn-primary" style="padding: 0.7rem 1.6rem; font-size: 0.92rem; border-radius: 9999px;">
+            <i data-lucide="camera" style="width: 17px; height: 17px;"></i> Open Camera & Verify
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Attendance Verified Toast -->
+      <div id="verification-toast" class="live-verification-toast">
+        <i data-lucide="check-circle-2" style="width: 18px; height: 18px; color: #ffffff;"></i>
+        <span>Attendance Verified: Present (Sustained Presence Confirmed)</span>
       </div>
     </div>
 

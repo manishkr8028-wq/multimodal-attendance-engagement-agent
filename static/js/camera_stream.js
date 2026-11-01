@@ -14,6 +14,7 @@ class CameraHUDController {
 
     this.latestDetections = [];
     this.simulatedTime = 0;
+    this.verifiedNotified = false;
 
     this.initEventListeners();
   }
@@ -206,6 +207,21 @@ class CameraHUDController {
     const isSustained = face.sustained_threshold_met;
     const boxColor = isSustained ? '#10b981' : '#6366f1';
 
+    // Trigger verification notification when sustained threshold met
+    if (isSustained && !this.verifiedNotified) {
+      this.verifiedNotified = true;
+      const toast = document.getElementById('verification-toast');
+      if (toast) {
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 4500);
+      }
+      const presenceBadge = document.getElementById('sustained-timer-badge');
+      if (presenceBadge) {
+        presenceBadge.style.borderColor = '#10b981';
+        presenceBadge.style.color = '#34d399';
+      }
+    }
+
     // 1. Draw glowing corner brackets
     ctx.strokeStyle = boxColor;
     ctx.lineWidth = 2.5;
@@ -240,11 +256,12 @@ class CameraHUDController {
     ctx.stroke();
 
     // 2. Draw subtle translucent fill
-    ctx.fillStyle = isSustained ? 'rgba(16, 185, 129, 0.05)' : 'rgba(99, 102, 241, 0.05)';
+    ctx.fillStyle = isSustained ? 'rgba(16, 185, 129, 0.08)' : 'rgba(99, 102, 241, 0.06)';
     ctx.fillRect(x, y, w, h);
 
     // 3. Header badge on top of box
-    const label = `Student #${face.track_id || idx + 1} | ${isSustained ? 'VERIFIED PRESENT' : 'VERIFYING...'}`;
+    const studentTitle = face.student_name || `Student #${face.track_id || idx + 1}`;
+    const label = `${studentTitle} | ${isSustained ? '✓ VERIFIED PRESENT' : 'VERIFYING PRESENCE...'}`;
     ctx.font = 'bold 11px Outfit, Inter, sans-serif';
     const textWidth = ctx.measureText(label).width;
 
@@ -255,11 +272,12 @@ class CameraHUDController {
     ctx.fillText(label, x + 7, Math.max(14, y - 8));
 
     // 4. Sub-tag below box: Sustained time & Pose angle
-    const subLabel = `Presence: ${face.sustained_seconds || 0}s | Gaze: ${Math.round((face.attention_score || 0.8) * 100)}%`;
+    const sustainedSec = Math.round((face.sustained_seconds || 0) * 10) / 10;
+    const subLabel = `Sustained: ${sustainedSec}s / 10s | Gaze: ${Math.round((face.attention_score || 0.8) * 100)}%`;
     ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
     ctx.fillRect(x, y + h + 4, ctx.measureText(subLabel).width + 12, 18);
 
-    ctx.fillStyle = '#a5b4fc';
+    ctx.fillStyle = isSustained ? '#6ee7b7' : '#a5b4fc';
     ctx.font = '10px Outfit, sans-serif';
     ctx.fillText(subLabel, x + 6, y + h + 17);
   }

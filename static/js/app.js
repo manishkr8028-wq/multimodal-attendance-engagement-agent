@@ -19,6 +19,8 @@ class MultimodalApp {
 
   initDOMElements() {
     this.startBtn = document.getElementById('start-session-btn');
+    this.overlayStartBtn = document.getElementById('camera-overlay-start-btn');
+    this.cameraOverlay = document.getElementById('camera-start-overlay');
     this.pauseBtn = document.getElementById('pause-session-btn');
     this.endBtn = document.getElementById('end-session-btn');
     this.triggerAiBtn = document.getElementById('trigger-ai-btn');
@@ -45,6 +47,9 @@ class MultimodalApp {
   initEvents() {
     if (this.startBtn) {
       this.startBtn.addEventListener('click', () => this.startSession());
+    }
+    if (this.overlayStartBtn) {
+      this.overlayStartBtn.addEventListener('click', () => this.startSession());
     }
     if (this.pauseBtn) {
       this.pauseBtn.addEventListener('click', () => this.togglePause());
@@ -88,6 +93,9 @@ class MultimodalApp {
     }
 
     // 2. Initialize Camera and Audio
+    if (this.cameraOverlay) {
+      this.cameraOverlay.classList.add('hidden');
+    }
     if (window.cameraController) await window.cameraController.startCamera();
     if (window.audioController) await window.audioController.startAudio();
 
@@ -274,6 +282,7 @@ class MultimodalApp {
 
     if (window.cameraController) window.cameraController.stopCamera();
     if (window.audioController) window.audioController.stopAudio();
+    if (this.cameraOverlay) this.cameraOverlay.classList.remove('hidden');
 
     try {
       const res = await fetch(`/api/sessions/${this.sessionId}/end`, { method: 'POST' });
